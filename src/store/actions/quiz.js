@@ -3,6 +3,8 @@ import {
   FETCH_QUIZLES_START,
   FETCH_QUIZLES_SUCCESS,
   FETCH_QUIZLES_ERROR,
+  FETCH_QUIZ_SUCCESS,
+  QUIZ_SET_STATE,
 } from "./actionTypes";
 
 export function fetchQuizes() {
@@ -24,6 +26,24 @@ export function fetchQuizes() {
     }
   };
 }
+export function fetchQuizById(quizId) {
+  return async (dispatch) => {
+    dispatch(fetchQuizesStart());
+    try {
+      const response = await axios.get(`/quizes/${quizId}.json`);
+      const quiz = response.data;
+      dispatch(fetchQuizSuccess(quiz));
+    } catch (e) {
+      dispatch(fetchQuizesError(e));
+    }
+  };
+}
+export function fetchQuizSuccess(quiz) {
+  return {
+    type: FETCH_QUIZ_SUCCESS,
+    quiz,
+  };
+}
 
 export function fetchQuizesStart() {
   return {
@@ -40,5 +60,54 @@ export function fetchQuizesError(e) {
   return {
     type: FETCH_QUIZLES_ERROR,
     error: e,
+  };
+}
+
+export function quizSetState(answerState, results) {
+  return {
+    type: QUIZ_SET_STATE,
+    answerState,
+    results,
+  };
+}
+
+export function quizAnswerClick(answerId) {
+  return (dispatch, getState) => {
+    const state = getState().quiz;
+    if (state.answerState) {
+      const key = Object.keys(state.answerState)[0];
+      if (state.answerState[key] === "success") {
+        return;
+      }
+    }
+
+    const question = state.quiz[state.activeQuestion];
+    const results = state.results;
+
+    if (question.rightAnswerId === answerId) {
+      if (!results[question.id]) {
+        results[question.id] = "success";
+      }
+
+      dispatch(quizSetState({ [answerId]: "success" }, results));
+
+      const timeout = window.setTimeout(() => {
+        if (this.isQuizFinished()) {
+          //   this.setState({
+          //     isFinished: true,
+          //   });
+        } else {
+          //   this.setState({
+          //     activeQuestion: this.state.activeQuestion + 1,
+          //     answerState: null,
+          //   });
+        }
+        window.clearTimeout(timeout);
+      }, 1000);
+    } else {
+      results[question.id] = "error";
+
+      dispatch(quizSetState({ [answerId]: "error" }, results));
+    }
   };
 }
