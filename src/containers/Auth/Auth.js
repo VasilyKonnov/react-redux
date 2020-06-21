@@ -1,122 +1,134 @@
-import React, {Component} from 'react'
-import classes from './Auth.css'
-import Button from '../../components/UI/Button/Button'
-import Input from '../../components/UI/Input/Input'
-import is from 'is_js'
-import axios from 'axios'
+import React, { Component } from "react";
+import classes from "./Auth.css";
+import Button from "../../components/UI/Button/Button";
+import Input from "../../components/UI/Input/Input";
+import is from "is_js";
+import { connect } from "react-redux";
+import auth from "../../store/actions/auth";
 
-export default class Auth extends Component {
-
+class Auth extends Component {
   state = {
     isFormValid: false,
     formControls: {
       email: {
-        value: '',
-        type: 'email',
-        label: 'Email',
-        errorMessage: 'Введите корректный email',
+        value: "",
+        type: "email",
+        label: "Email",
+        errorMessage: "Введите корректный email",
         valid: false,
         touched: false,
         validation: {
           required: true,
-          email: true
-        }
+          email: true,
+        },
       },
       password: {
-        value: '',
-        type: 'password',
-        label: 'Пароль',
-        errorMessage: 'Введите корректный пароль',
+        value: "",
+        type: "password",
+        label: "Пароль",
+        errorMessage: "Введите корректный пароль",
         valid: false,
         touched: false,
         validation: {
           required: true,
-          minLength: 6
-        }
-      }
-    }
-  }
+          minLength: 6,
+        },
+      },
+    },
+  };
 
-  loginHandler = async () => {
-    const authData = {
-      email: this.state.formControls.email.value,
-      password: this.state.formControls.password.value,
-      returnSecureToken: true
-    }
-    try {
-      const response = await axios.post('https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyBRj1R0UEHzbzdDaOOQIhjqWUvDsusN4Mo', authData)
+  loginHandler = () => {
+    this.props.auth(
+      this.state.formControls.email.value,
+      this.state.formControls.password.value,
+      true
+    );
 
-      console.log(response.data)
-    } catch (e) {
-      console.log(e)
-    }
-  }
+    // try {
+    //   const response = await axios.post(
+    //     "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=AIzaSyBRj1R0UEHzbzdDaOOQIhjqWUvDsusN4Mo",
+    //     authData
+    //   );
 
-  registerHandler = async () => {
-    const authData = {
-      email: this.state.formControls.email.value,
-      password: this.state.formControls.password.value,
-      returnSecureToken: true
-    }
-    try {
-      const response = await axios.post('https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyBRj1R0UEHzbzdDaOOQIhjqWUvDsusN4Mo', authData)
+    //   console.log(response.data);
+    // } catch (e) {
+    //   console.log(e);
+    // }
+  };
 
-      console.log(response.data)
-    } catch (e) {
-      console.log(e)
-    }
-  }
+  registerHandler = () => {
+    this.props.auth(
+      this.state.formControls.email.value,
+      this.state.formControls.password.value,
+      false
+    );
+    // const authData = {
+    //   email: this.state.formControls.email.value,
+    //   password: this.state.formControls.password.value,
+    //   returnSecureToken: true,
+    // };
+    // try {
+    //   const response = await axios.post(
+    //     "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=AIzaSyBRj1R0UEHzbzdDaOOQIhjqWUvDsusN4Mo",
+    //     authData
+    //   );
+    //   console.log(response.data);
+    // } catch (e) {
+    //   console.log(e);
+    // }
+  };
 
-  submitHandler = event => {
-    event.preventDefault()
-  }
+  submitHandler = (event) => {
+    event.preventDefault();
+  };
 
   validateControl(value, validation) {
     if (!validation) {
-      return true
+      return true;
     }
 
-    let isValid = true
+    let isValid = true;
 
     if (validation.required) {
-      isValid = value.trim() !== '' && isValid
+      isValid = value.trim() !== "" && isValid;
     }
 
     if (validation.email) {
-      isValid = is.email(value) && isValid
+      isValid = is.email(value) && isValid;
     }
 
     if (validation.minLength) {
-      isValid = value.length >= validation.minLength && isValid
+      isValid = value.length >= validation.minLength && isValid;
     }
 
-    return isValid
+    return isValid;
   }
 
   onChangeHandler = (event, controlName) => {
-    const formControls = { ...this.state.formControls }
-    const control = { ...formControls[controlName] }
+    const formControls = { ...this.state.formControls };
+    const control = { ...formControls[controlName] };
 
-    control.value = event.target.value
-    control.touched = true
-    control.valid = this.validateControl(control.value, control.validation)
+    control.value = event.target.value;
+    control.touched = true;
+    control.valid = this.validateControl(control.value, control.validation);
 
-    formControls[controlName] = control
+    formControls[controlName] = control;
 
-    let isFormValid = true
+    let isFormValid = true;
 
-    Object.keys(formControls).forEach(name => {
-      isFormValid = formControls[name].valid && isFormValid
-    })
+    Object.keys(formControls).forEach((name) => {
+      isFormValid = formControls[name].valid && isFormValid;
+    });
 
     this.setState({
-      formControls, isFormValid
-    })
-  }
+      formControls,
+      isFormValid,
+    });
+  };
 
   renderInputs() {
     return Object.keys(this.state.formControls).map((controlName, index) => {
-      const control = this.state.formControls[controlName]
+      const control = this.state.formControls[controlName];
       return (
         <Input
           key={controlName + index}
@@ -127,10 +139,10 @@ export default class Auth extends Component {
           label={control.label}
           shouldValidate={!!control.validation}
           errorMessage={control.errorMessage}
-          onChange={event => this.onChangeHandler(event, controlName)}
+          onChange={(event) => this.onChangeHandler(event, controlName)}
         />
-      )
-    })
+      );
+    });
   }
 
   render() {
@@ -140,8 +152,7 @@ export default class Auth extends Component {
           <h1>Авторизация</h1>
 
           <form onSubmit={this.submitHandler} className={classes.AuthForm}>
-
-            { this.renderInputs() }
+            {this.renderInputs()}
 
             <Button
               type="success"
@@ -161,6 +172,14 @@ export default class Auth extends Component {
           </form>
         </div>
       </div>
-    )
+    );
   }
 }
+
+function mapDispatchToProps(dispatch) {
+  return {
+    auth: (email, password, isLogin) =>
+      dispatch(auth(email, password, isLogin)),
+  };
+}
+export default connect(null, mapDispatchToProps)(Auth);
