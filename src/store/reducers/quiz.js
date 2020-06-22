@@ -1,13 +1,10 @@
 import {
-  FETCH_QUIZLES_START,
-  FETCH_QUIZLES_SUCCESS,
-  FETCH_QUIZLES_ERROR,
   FETCH_QUIZ_SUCCESS,
-  QUIZ_SET_STATE,
-  FINISH_QUIZ,
-  QUIZ_NEXT_QUESTION,
-  QUIZE_RETRY,
-} from "../actions/actionTypes";
+  FETCH_QUIZES_ERROR,
+  FETCH_QUIZES_START,
+  FETCH_QUIZES_SUCCESS, FINISH_QUIZ, QUIZ_NEXT_QUESTION, QUIZ_RETRY,
+  QUIZ_SET_STATE
+} from '../actions/actionTypes';
 
 const initialState = {
   quizes: [],
@@ -17,63 +14,48 @@ const initialState = {
   isFinished: false,
   activeQuestion: 0,
   answerState: null,
-  quiz: null,
-};
+  quiz: null
+}
 
-export default function quizeReducer(state = initialState, action) {
+export default function quizReducer(state = initialState, action) {
   switch (action.type) {
-    case FETCH_QUIZLES_START:
+    case FETCH_QUIZES_START:
       return {
-        ...state,
-        loading: true,
-      };
-
-    case FETCH_QUIZLES_SUCCESS:
+        ...state, loading: true
+      }
+    case FETCH_QUIZES_SUCCESS:
       return {
-        ...state,
-        loading: false,
-        quizes: action.quizes,
-      };
-
-    case FETCH_QUIZLES_ERROR:
+        ...state, loading: false, quizes: action.quizes
+      }
+    case FETCH_QUIZES_ERROR:
       return {
-        ...state,
-        loading: false,
-        error: action.error,
-      };
+        ...state, loading: false, error: action.error
+      }
     case FETCH_QUIZ_SUCCESS:
       return {
-        ...state,
-        loading: false,
-        quiz: action.quiz,
-      };
+        ...state, loading: false, quiz: action.quiz
+      }
     case QUIZ_SET_STATE:
       return {
-        ...state,
-        answerState: action.answerState,
-        results: action.results,
-      };
+        ...state, answerState: action.answerState, results: action.results
+      }
     case FINISH_QUIZ:
       return {
-        ...state,
-        isFinished: true,
-      };
+        ...state, isFinished: true
+      }
     case QUIZ_NEXT_QUESTION:
       return {
-        ...state,
-        activeQuestion: action.number,
-        answerState: null,
-      };
-    case QUIZE_RETRY:
+        ...state, answerState: null, activeQuestion: action.number
+      }
+    case QUIZ_RETRY:
       return {
         ...state,
         activeQuestion: 0,
         answerState: null,
         isFinished: false,
-        results: {},
-      };
-
+        results: {}
+      }
     default:
-      return state;
+      return state
   }
 }
